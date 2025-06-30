@@ -1,0 +1,60 @@
+# Ignore .env files
+.env
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Node.js dependencies
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Build outputs
+/dist
+/build
+/out
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Logs
+logs/
+*.log
+*.log.*
+
+# Dependency lock files (optional, depending on your setup)
+# package-lock.json
+# yarn.lock
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+
+# Coverage reports
+coverage/
+*.lcov
+
+# Local database files
+*.db
+*.sqlite
+
+# Python-specific (if applicable)
+__pycache__/
+*.py[cod]
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+env/
+*.egg-info/
