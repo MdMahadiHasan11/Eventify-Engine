@@ -1,3 +1,4 @@
+// models/eventModel.js
 const { getCollections } = require("../config/db");
 const { ObjectId } = require("mongodb");
 
@@ -6,13 +7,14 @@ const eventModel = {
     const { eventCollection } = getCollections();
     return await eventCollection.find().toArray();
   },
-  getMyEvents: async () => {
+  getMyEvents: async (userId) => {
     const { eventCollection } = getCollections();
-    return await eventCollection.find().toArray();
+    return await eventCollection
+      .find({ creatorId: new ObjectId(userId) })
+      .toArray();
   },
   postEvents: async (eventData) => {
     const { eventCollection } = getCollections();
-    // Initialize attendeeCount and attendees array
     const eventWithDefaults = {
       ...eventData,
       attendeeCount: 0,
@@ -33,22 +35,20 @@ const eventModel = {
     }
     return { ...eventData, _id: eventId };
   },
-  patchEvents: async (eventId, { user_id }) => {
+  patchEvents: async (eventId, { email }) => {
     const { eventCollection } = getCollections();
-    // Check if user_id is already in attendees
     const event = await eventCollection.findOne({ _id: new ObjectId(eventId) });
     if (!event) {
       throw new Error("Event not found");
     }
-    if (event.attendees && event.attendees.includes(user_id)) {
+    if (event.attendees && event.attendees.includes(email)) {
       throw new Error("User has already joined this event");
     }
-    // Update attendeeCount and add user_id to attendees
     const result = await eventCollection.updateOne(
       { _id: new ObjectId(eventId) },
       {
         $inc: { attendeeCount: 1 },
-        $addToSet: { attendees: user_id }, // $addToSet prevents duplicates
+        $addToSet: { attendees: email }, // Store email in attendees
       },
       { upsert: false }
     );
@@ -58,7 +58,7 @@ const eventModel = {
     return {
       _id: eventId,
       attendeeCount: (event.attendeeCount || 0) + 1,
-      attendees: [...(event.attendees || []), user_id],
+      attendees: [...(event.attendees || []), email],
     };
   },
   deleteEvents: async (eventId) => {
@@ -70,6 +70,11 @@ const eventModel = {
       throw new Error("Event not found");
     }
     return { success: true, eventId };
+  },
+  // Add this method to fetch a single event by ID (used in controllers)
+  getEventById: async (eventId) => {
+    const { eventCollection } = getCollections();
+    return await eventCollection.findOne({ _id: new ObjectId(eventId) });
   },
 };
 

@@ -13,12 +13,14 @@ const client = new MongoClient(uri, {
 });
 
 let eventCollection;
+let userCollection;
 
 async function connectDB() {
   try {
     // await client.connect(); // Uncomment if needed for your MongoDB version
     const db = client.db("eventDB");
     eventCollection = db.collection("events");
+    userCollection = db.collection("users");
 
     console.log("Successfully connected to MongoDB!");
   } catch (error) {
@@ -31,5 +33,6 @@ module.exports = {
   connectDB,
   getCollections: () => ({
     eventCollection,
+    userCollection,
   }),
 };

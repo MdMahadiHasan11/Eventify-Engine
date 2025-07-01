@@ -1,12 +1,27 @@
+// routes/router.js
 const express = require("express");
 const router = express.Router();
 const eventController = require("../controllers/eventController");
+const authMiddleware = require("../middleware/verifyAuth");
+// const { authMiddleware } = require("../middleware/verifyAuth");
 
 router.get("/events/all", eventController.getAllEventsController);
-router.patch("/events/all/:eventId", eventController.patchAllEventsController);
-router.get("/events", eventController.getMyEventsController);
-router.post("/events", eventController.postEventsController);
-router.put("/events/:eventId", eventController.putEventsController);
-router.delete("/events/:eventId", eventController.deleteEventsController);
+router.get("/events", authMiddleware, eventController.getMyEventsController);
+router.post("/events", authMiddleware, eventController.postEventsController);
+router.put(
+  "/events/:eventId",
+  authMiddleware,
+  eventController.putEventsController
+);
+router.patch(
+  "/events/all/:eventId",
+  authMiddleware,
+  eventController.patchAllEventsController
+);
+router.delete(
+  "/events/:eventId",
+  authMiddleware,
+  eventController.deleteEventsController
+);
 
 module.exports = router;

@@ -2,9 +2,10 @@ const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 const { connectDB } = require("./config/db");
-
+const cookieParser = require("cookie-parser");
 const userRoutes = require("./routes/userRoutes");
 const eventRoutes = require("./routes/eventRoutes");
+const authRoutes = require("./routes/auth");
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -12,13 +13,16 @@ const port = process.env.PORT || 5000;
 // Middleware
 app.use(
   cors({
-    origin: ["http://localhost:5173"],
+    origin: ["http://localhost:5173", "http://localhost:5170"],
     credentials: true,
   })
 );
 app.use(express.json());
 
 // Routes
+app.use(cookieParser());
+
+app.use(authRoutes);
 app.use(userRoutes);
 app.use(eventRoutes);
 
