@@ -17,7 +17,7 @@ let eventCollection;
 async function connectDB() {
   try {
     // await client.connect(); // Uncomment if needed for your MongoDB version
-    const db = client.db("eventifyDB");
+    const db = client.db("eventDB");
     eventCollection = db.collection("events");
 
     console.log("Successfully connected to MongoDB!");
