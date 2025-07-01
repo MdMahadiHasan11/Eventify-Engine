@@ -13,7 +13,11 @@ const port = process.env.PORT || 5000;
 // Middleware
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://localhost:5170"],
+    origin: [
+      "https://eventify-one-liart.vercel.app",
+      "http://localhost:5173",
+      "http://localhost:5170",
+    ],
     credentials: true,
   })
 );
