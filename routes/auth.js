@@ -5,20 +5,6 @@ const { ObjectId } = require("mongodb");
 const { hashPassword } = require("../utils/hash");
 const { getCollections } = require("../config/db");
 
-// Input validation
-const validateUserInput = (username, email, password) => {
-  if (!username || typeof username !== "string" || username.length < 3) {
-    return "Username must be at least 3 characters long";
-  }
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return "Invalid email format";
-  }
-  if (!password || password.length < 6) {
-    return "Password must be at least 6 characters long";
-  }
-  return null;
-};
-
 // Middleware to verify token
 const authMiddleware = async (req, res, next) => {
   const { userCollection } = getCollections();
@@ -187,78 +173,6 @@ router.get("/verify-token", async (req, res) => {
   } catch (error) {
     console.error("Token verification error:", error);
     res.status(500).json({ valid: false, message: "Server error" });
-  }
-});
-
-router.post("/follow/:userId", authMiddleware, async (req, res) => {
-  const { userCollection } = getCollections();
-  const { userId } = req.params;
-  const currentUser = req.user;
-
-  try {
-    if (!ObjectId.isValid(userId)) {
-      return res.status(400).json({ message: "Invalid user ID" });
-    }
-
-    const targetUser = await userCollection.findOne({
-      _id: new ObjectId(userId),
-    });
-    if (!targetUser) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    if (currentUser._id.toString() === userId) {
-      return res.status(400).json({ message: "Cannot follow yourself" });
-    }
-
-    await userCollection.updateOne(
-      { _id: currentUser._id },
-      { $addToSet: { following: new ObjectId(userId) } }
-    );
-
-    await userCollection.updateOne(
-      { _id: new ObjectId(userId) },
-      { $addToSet: { followers: currentUser._id } }
-    );
-
-    res.json({ message: "Followed successfully" });
-  } catch (error) {
-    console.error("Follow error:", error);
-    res.status(500).json({ message: "Server error" });
-  }
-});
-
-router.post("/unfollow/:userId", authMiddleware, async (req, res) => {
-  const { userCollection } = getCollections();
-  const { userId } = req.params;
-  const currentUser = req.user;
-
-  try {
-    if (!ObjectId.isValid(userId)) {
-      return res.status(400).json({ message: "Invalid user ID" });
-    }
-
-    const targetUser = await userCollection.findOne({
-      _id: new ObjectId(userId),
-    });
-    if (!targetUser) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    await userCollection.updateOne(
-      { _id: currentUser._id },
-      { $pull: { following: new ObjectId(userId) } }
-    );
-
-    await userCollection.updateOne(
-      { _id: new ObjectId(userId) },
-      { $pull: { followers: currentUser._id } }
-    );
-
-    res.json({ message: "Unfollowed successfully" });
-  } catch (error) {
-    console.error("Unfollow error:", error);
-    res.status(500).json({ message: "Server error" });
   }
 });
 
